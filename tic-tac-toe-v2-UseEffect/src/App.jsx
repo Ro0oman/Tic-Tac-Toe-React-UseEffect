@@ -1,32 +1,59 @@
 import { useState } from "react"
-
 const TURNS = {
-  x: '❌',
-  o: '⭕'
+  x: 'x',
+  o: 'o'
 }
-
-
 
 const Square = ({children, isSelected, updateBoard, index}) => {
   const className = `square ${isSelected ? 'is-selected' : ''}`
 
   const handleClick = () => {
-    updateBoard()
+    updateBoard(index)
   }
   return(
-    <div className={className}>
+    <div onClick={handleClick} className={className}>
      {children}
     </div>
   )
 }
+const WINNER_COMBOS = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6]
+]
 
 function App() {
   const [board, setBoard] = useState(Array(9).fill(null))
   const [turn, setTurn] = useState(TURNS.x)
+  const [winner, setWinner] = useState(null)
+
+  const checkWinner = (boardToCheck) => {
+    for (const combo of WINNER_COMBOS) {
+      const [a, b, c] = combo
+      if ( boardToCheck[a] === boardToCheck[b] && boardToCheck[a] === boardToCheck[c] && boardToCheck[a] !== null) {
+        setWinner(boardToCheck[a])
+        console.log(boardToCheck[a]);return boardToCheck[a]
+      }
+    }
+  }
 
   const updateBoard = (index) => {
+    if (board[index] || winner) return
+    const newBoard = [...board]
+    newBoard[index] = turn
+    setBoard(newBoard)
     const newTurn = turn === TURNS.x ? TURNS.o : TURNS.x
-    
+    setTurn(newTurn)
+    const newWinner = checkWinner(newBoard)
+    if (newWinner) {
+      console.log(1);
+      setWinner(newWinner)
+    }
   }
 
   return (
